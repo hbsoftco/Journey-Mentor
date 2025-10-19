@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-dark-blue: hsl(209 23% 22%);
+  --color-very-dark-blue-dm: hsl(207 26% 17%);
+  --color-very-dark-blue: hsl(200 15% 8%);
+  --color-dark-gray: hsl(0 0% 52%);
+  --color-very-light-gray: hsl(0 0% 98%);
+  --color-white: hsl(0 0% 100%);
+
+  /* Typography */
+  --font-family-sans: "Nunito Sans", system-ui, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-semibold: 600;
+  --font-weight-extrabold: 800;
+
+  /* Font Sizes */
+  --font-size-body-home: 14px;
+  --font-size-body-detail: 16px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family-sans);
+    font-weight: var(--font-weight-light);
+
+    /* Light theme (default) */
+    --color-text: var(--color-very-dark-blue);
+    --color-bg: var(--color-very-light-gray);
+    --color-element: var(--color-white);
+
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  html.dark {
+    /* Dark theme */
+    --color-text: var(--color-white);
+    --color-bg: var(--color-very-dark-blue-dm);
+    --color-element: var(--color-dark-blue);
+  }
+
+  body {
+    font-size: var(--font-size-body-home);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      font-size: var(--font-size-body-detail);
+    }
+  }
+}
