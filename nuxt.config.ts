@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
     "@nuxt/icon",
     "@nuxtjs/color-mode",
+    "@nuxt/image",
   ],
 
   css: ["~/assets/css/main.css"],
@@ -57,5 +58,9 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "https://restcountries.com/v2",
     },
+  },
+
+  image: {
+    domains: ["restcountries.com"],
   },
 });
