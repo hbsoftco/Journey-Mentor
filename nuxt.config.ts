@@ -52,4 +52,10 @@ export default defineNuxtConfig({
     fallback: "light",
     storageKey: "nuxt-color-mode",
   },
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "https://restcountries.com/v2",
+    },
+  },
 });

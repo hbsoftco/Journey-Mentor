@@ -8,7 +8,9 @@ import ThemeToggle from "~/components/layout/theme-toggle.vue";
       <h1 class="font-black text-base md:text-xl">
         Where in the world?
       </h1>
-      <ThemeToggle />
+      <ClientOnly>
+        <ThemeToggle />
+      </ClientOnly>
     </div>
   </div>
 </template>
