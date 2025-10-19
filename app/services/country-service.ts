@@ -14,12 +14,6 @@ export class CountryService {
       population: c.population,
       capital: c.capital,
       flag: c.flag,
-      currencies: c.currencies,
-      subregion: c.subregion,
-      borders: c.borders,
-      topLevelDomain: c.topLevelDomain,
-      independent: c.independent,
-      nativeName: c.nativeName,
     }));
   }
 }

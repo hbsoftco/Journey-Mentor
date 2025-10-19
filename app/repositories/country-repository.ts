@@ -13,8 +13,7 @@ export class CountryRepository extends BaseRepository {
 
   async getAll(): Promise<CountryApiResponse[]> {
     return this.get<CountryApiResponse[]>(this.endpoints.all, {
-      fields: "name,capital,population",
-      // fields: "name,capital,population,flag,region,currencies,nativeName,subregion,borders,topLevelDomain",
+      fields: "name,capital,population,flag,region",
     });
   }
 
