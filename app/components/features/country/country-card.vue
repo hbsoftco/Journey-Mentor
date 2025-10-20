@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Country } from "~/types/domain/country";
+import type { Country } from "~/types";
 
 type Props = {
   country: Country;
@@ -8,7 +8,7 @@ type Props = {
 const props = defineProps<Props>();
 
 function navigateToDetail() {
-  navigateTo({ name: "country-detail", params: { name: props.country.name } });
+  navigateTo({ name: "country-code", params: { code: props.country.alpha3Code } });
 }
 
 function formatPopulation(population: number): string {
@@ -21,7 +21,7 @@ function formatPopulation(population: number): string {
     class="group cursor-pointer rounded-sm dark:bg-dark-blue shadow-md overflow-hidden transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl"
     tabindex="0"
     :aria-label="`View details for ${country.name}`"
-    @click="navigateToDetail"
+    @click="navigateToDetail()"
   >
     <!-- Flag Section -->
     <div class="w-full aspect-[5/3] overflow-hidden dark:bg-dark-blue bg-gray-100">
