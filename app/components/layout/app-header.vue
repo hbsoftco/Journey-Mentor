@@ -7,7 +7,7 @@ import ThemeToggle from "~/components/layout/theme-toggle.vue";
     <div class="flex justify-between items-center container mx-auto">
       <NuxtLink
         to="/"
-        class="font-black text-base md:text-xl text-dark-blue dark:text-white hover:opacity-80 transition-opacity"
+        class="font-black text-base md:text-xl text-dark-blue dark:text-white hover:opacity-80 transition-opacity no-underline"
       >
         Where in the world?
       </NuxtLink>

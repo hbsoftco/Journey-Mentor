@@ -22,7 +22,7 @@ const { pending, error } = await useAsyncData(
     return await countriesStore.fetchCountries();
   },
   {
-    server: false,
+    server: true,
     lazy: false,
     // Get initial data from store if available
     default: () => countriesStore.countries as Country[],
