@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxtjs/color-mode",
     "@nuxt/image",
+    "@pinia/nuxt",
   ],
 
   css: ["~/assets/css/main.css"],
@@ -63,4 +64,6 @@ export default defineNuxtConfig({
   image: {
     domains: ["restcountries.com"],
   },
+
+  pinia: {},
 });
