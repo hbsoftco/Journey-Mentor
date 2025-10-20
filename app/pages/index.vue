@@ -4,6 +4,7 @@ import type { Country } from "~/types";
 import AppInput from "~/components/common/app-input.vue";
 import AppSelect from "~/components/common/app-select.vue";
 import CountryCard from "~/components/features/country/country-card.vue";
+import { fuzzyMatch } from "~/utils/fuzzy-search";
 
 const route = useRoute();
 const router = useRouter();
@@ -11,6 +12,7 @@ const countriesStore = useCountriesStore();
 
 // Initialize filters from URL
 const searchQuery = ref((route.query.search as string) || "");
+const debouncedSearchQuery = ref((route.query.search as string) || "");
 const selectedRegion = ref((route.query.region as string) || "");
 const sortBy = ref((route.query.sort as string) || "");
 
@@ -18,13 +20,11 @@ const sortBy = ref((route.query.sort as string) || "");
 const { pending, error } = await useAsyncData(
   "countries-list",
   async () => {
-    // Store handles caching internally
     return await countriesStore.fetchCountries();
   },
   {
-    server: false,
+    server: true,
     lazy: false,
-    // Get initial data from store if available
     default: () => countriesStore.countries as Country[],
   },
 );
@@ -46,53 +46,15 @@ const sortOptions = [
   { value: "population-desc", label: "Population (High to Low)" },
 ];
 
-// Fuzzy search
-function levenshteinDistance(str1: string, str2: string): number {
-  const matrix: number[][] = [];
+// Debounce search input (300ms delay)
+let searchDebounceTimer: NodeJS.Timeout;
+watch(searchQuery, (newValue) => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = newValue;
+  }, 300);
+});
 
-  // Initialize first column
-  for (let i = 0; i <= str2.length; i++) {
-    matrix[i] = [i];
-  }
-
-  // Initialize first row
-  for (let j = 0; j <= str1.length; j++) {
-    matrix[0]![j] = j;
-  }
-
-  for (let i = 1; i <= str2.length; i++) {
-    for (let j = 1; j <= str1.length; j++) {
-      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-        matrix[i]![j] = matrix[i - 1]![j - 1]!;
-      }
-      else {
-        matrix[i]![j] = Math.min(
-          matrix[i - 1]![j - 1]! + 1,
-          matrix[i]![j - 1]! + 1,
-          matrix[i - 1]![j]! + 1,
-        );
-      }
-    }
-  }
-
-  return matrix[str2.length]![str1.length]!;
-}
-
-function fuzzyMatch(str: string, pattern: string): boolean {
-  if (!pattern)
-    return true;
-  const strLower = str.toLowerCase();
-  const patternLower = pattern.toLowerCase();
-
-  if (strLower.includes(patternLower))
-    return true;
-
-  const distance = levenshteinDistance(strLower, patternLower);
-  const threshold = Math.floor(patternLower.length * 0.3);
-  return distance <= threshold;
-}
-
-// Use store's countries
 const allCountries = computed(() => countriesStore.countries);
 
 // Filtered and sorted countries
@@ -102,26 +64,22 @@ const filteredCountries = computed(() => {
 
   let result = [...allCountries.value];
 
-  // Filter by search
-  if (searchQuery.value) {
+  if (debouncedSearchQuery.value) {
     result = result.filter(country =>
-      fuzzyMatch(country.name, searchQuery.value),
+      fuzzyMatch(country.name, debouncedSearchQuery.value),
     );
   }
 
-  // Filter by region
   if (selectedRegion.value) {
     result = countriesStore.getCountriesByRegion(selectedRegion.value);
 
-    // Apply search on filtered region
-    if (searchQuery.value) {
+    if (debouncedSearchQuery.value) {
       result = result.filter(country =>
-        fuzzyMatch(country.name, searchQuery.value),
+        fuzzyMatch(country.name, debouncedSearchQuery.value),
       );
     }
   }
 
-  // Sort
   if (sortBy.value) {
     const [field, order] = sortBy.value.split("-");
     result.sort((a, b) => {
@@ -142,16 +100,45 @@ const filteredCountries = computed(() => {
   return result;
 });
 
-// Sync with URL
-watch([searchQuery, selectedRegion, sortBy], () => {
+// Infinite scroll implementation
+const { displayedItems, hasMore, loadMore } = useInfiniteScroll(filteredCountries, 20);
+
+// Intersection observer for infinite scroll
+const loadMoreTrigger = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0]?.isIntersecting && hasMore.value) {
+        loadMore();
+      }
+    },
+    { threshold: 0.5 },
+  );
+
+  if (loadMoreTrigger.value) {
+    observer.observe(loadMoreTrigger.value);
+  }
+
+  onUnmounted(() => {
+    observer.disconnect();
+  });
+});
+
+// Sync with URL (using debounced search)
+watch([debouncedSearchQuery, selectedRegion, sortBy], () => {
   const query: Record<string, string> = {};
-  if (searchQuery.value)
-    query.search = searchQuery.value;
+  if (debouncedSearchQuery.value)
+    query.search = debouncedSearchQuery.value;
   if (selectedRegion.value)
     query.region = selectedRegion.value;
   if (sortBy.value)
     query.sort = sortBy.value;
   router.push({ query });
+});
+
+onUnmounted(() => {
+  clearTimeout(searchDebounceTimer);
 });
 </script>
 
@@ -206,16 +193,29 @@ watch([searchQuery, selectedRegion, sortBy], () => {
       </p>
     </div>
 
-    <!-- Countries Grid -->
-    <div
-      v-else
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-14"
-    >
-      <CountryCard
-        v-for="country in filteredCountries"
-        :key="country.alpha3Code"
-        :country="country"
-      />
+    <!-- Countries Grid with Infinite Scroll -->
+    <div v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-14">
+        <CountryCard
+          v-for="country in displayedItems"
+          :key="country.alpha3Code"
+          :country="country"
+        />
+      </div>
+
+      <!-- Load More Trigger -->
+      <div
+        v-if="hasMore"
+        ref="loadMoreTrigger"
+        class="flex justify-center items-center py-8"
+      >
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-dark-blue dark:border-white" />
+      </div>
+
+      <!-- End of Results -->
+      <div v-else class="text-center py-8 text-dark-blue dark:text-white">
+        <p>All countries loaded</p>
+      </div>
     </div>
   </div>
 </template>

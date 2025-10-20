@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppButton from "~/components/common/app-button.vue";
+import { formatPopulation } from "~/utils/format-population";
 
 const route = useRoute();
 const router = useRouter();
@@ -19,6 +20,13 @@ const { data: country, pending, error } = await useAsyncData(
   },
 );
 
+// Set dynamic page title
+useHead({
+  title: () => country.value?.name
+    ? `${country.value.name} - Journey Mentor`
+    : "Journey Mentor",
+});
+
 // Get border countries from store
 const borderCountries = computed(() => {
   if (!country.value?.borders || country.value.borders.length === 0) {
@@ -26,11 +34,6 @@ const borderCountries = computed(() => {
   }
   return countriesStore.getCountriesByCodes(country.value.borders);
 });
-
-function formatPopulation(population: number): string {
-  return new Intl.NumberFormat("en-US").format(population);
-}
-
 function goBack() {
   router.back();
 }

@@ -13,6 +13,73 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
   ],
 
+  app: {
+    head: {
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes",
+      htmlAttrs: {
+        lang: "en",
+        dir: "ltr",
+      },
+      title: "Journey Mentor",
+      meta: [
+        { name: "theme-color", content: "#000000" },
+
+        // Primary Meta Tags
+        {
+          key: "description",
+          name: "description",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+        {
+          key: "author",
+          name: "author",
+          content: "Hossein Bajan",
+        },
+
+        // Open Graph / Facebook
+        {
+          key: "og:type",
+          property: "og:type",
+          content: "website",
+        },
+        {
+          key: "og:title",
+          property: "og:title",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+        {
+          key: "og:description",
+          property: "og:description",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+        {
+          key: "og:site_name",
+          property: "og:site_name",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+
+        // Twitter
+        {
+          key: "twitter:card",
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          key: "twitter:title",
+          name: "twitter:title",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+        {
+          key: "twitter:description",
+          name: "twitter:description",
+          content: "Submission for Journey Mentor’s Frontend Developer technical assessment.",
+        },
+
+      ],
+    },
+  },
+
   css: ["~/assets/css/main.css"],
 
   eslint: {
