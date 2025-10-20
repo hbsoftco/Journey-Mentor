@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
     baseURL: config.public.apiBaseUrl,
     retry: 1,
     retryDelay: 500,
-    cache: "force-cache",
+    cache: "no-cache",
 
     async onRequest({ options }) {
       // Set request headers

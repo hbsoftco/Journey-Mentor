@@ -1,4 +1,4 @@
-import type { Country } from "~/types/domain/country";
+import type { Country, CountryDetail } from "~/types";
 
 import { CountryRepository } from "~/repositories/country-repository";
 
@@ -14,6 +14,12 @@ export class CountryService {
       population: c.population,
       capital: c.capital,
       flag: c.flag,
+      alpha3Code: c.alpha3Code,
     }));
+  }
+
+  async getCountryByCode(code: string): Promise<CountryDetail> {
+    const apiResponse = await this.repo.getByCode(code);
+    return apiResponse;
   }
 }
