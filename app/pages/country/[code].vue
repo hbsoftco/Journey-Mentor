@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppButton from "~/components/common/app-button.vue";
+import { formatPopulation } from "~/utils/format-population";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,11 +34,6 @@ const borderCountries = computed(() => {
   }
   return countriesStore.getCountriesByCodes(country.value.borders);
 });
-
-function formatPopulation(population: number): string {
-  return new Intl.NumberFormat("en-US").format(population);
-}
-
 function goBack() {
   router.back();
 }

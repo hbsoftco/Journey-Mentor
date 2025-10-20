@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Country } from "~/types";
 
+import { formatPopulation } from "~/utils/format-population";
+
 type Props = {
   country: Country;
 };
@@ -9,10 +11,6 @@ const props = defineProps<Props>();
 
 function navigateToDetail() {
   navigateTo({ name: "country-code", params: { code: props.country.alpha3Code } });
-}
-
-function formatPopulation(population: number): string {
-  return new Intl.NumberFormat("en-US").format(population);
 }
 </script>
 
