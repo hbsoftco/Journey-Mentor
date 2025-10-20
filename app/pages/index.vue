@@ -4,6 +4,7 @@ import type { Country } from "~/types";
 import AppInput from "~/components/common/app-input.vue";
 import AppSelect from "~/components/common/app-select.vue";
 import CountryCard from "~/components/features/country/country-card.vue";
+import { fuzzyMatch } from "~/utils/fuzzy-search";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,52 +46,6 @@ const sortOptions = [
   { value: "population-asc", label: "Population (Low to High)" },
   { value: "population-desc", label: "Population (High to Low)" },
 ];
-
-// Fuzzy search
-function levenshteinDistance(str1: string, str2: string): number {
-  const matrix: number[][] = [];
-
-  // Initialize first column
-  for (let i = 0; i <= str2.length; i++) {
-    matrix[i] = [i];
-  }
-
-  // Initialize first row
-  for (let j = 0; j <= str1.length; j++) {
-    matrix[0]![j] = j;
-  }
-
-  for (let i = 1; i <= str2.length; i++) {
-    for (let j = 1; j <= str1.length; j++) {
-      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-        matrix[i]![j] = matrix[i - 1]![j - 1]!;
-      }
-      else {
-        matrix[i]![j] = Math.min(
-          matrix[i - 1]![j - 1]! + 1,
-          matrix[i]![j - 1]! + 1,
-          matrix[i - 1]![j]! + 1,
-        );
-      }
-    }
-  }
-
-  return matrix[str2.length]![str1.length]!;
-}
-
-function fuzzyMatch(str: string, pattern: string): boolean {
-  if (!pattern)
-    return true;
-  const strLower = str.toLowerCase();
-  const patternLower = pattern.toLowerCase();
-
-  if (strLower.includes(patternLower))
-    return true;
-
-  const distance = levenshteinDistance(strLower, patternLower);
-  const threshold = Math.floor(patternLower.length * 0.3);
-  return distance <= threshold;
-}
 
 // Use store's countries
 const allCountries = computed(() => countriesStore.countries);
