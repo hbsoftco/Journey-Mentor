@@ -1,7 +1,7 @@
-# Journey Mentor – REST Countries API (Vue 3 + TypeScript)
+# Journey Mentor – REST Countries API (Nuxt4, Vue 3 Composition API + TypeScript)
 
 **Project Type:** Frontend Coding Challenge
-**Tech Stack:** Vue 3, TypeScript, Pinia, Tailwind CSS, Nuxt 3, Vitest, REST Countries API
+**Tech Stack:** Vue 3, TypeScript, Pinia, Tailwind CSS, Nuxt 4, Vitest, REST Countries API
 **Purpose:** Display country data with search, filtering, dark/light mode, and client-side routing
 
 ---
@@ -16,7 +16,8 @@
 6. [Tech & Libraries](#tech--libraries)
 7. [Deployment](#deployment)
 8. [Additional Notes](#additional-notes)
-9. [Future Improvements / Roadmap](#future-improvements--roadmap)
+9. [Code Quality & Workflow](#code-quality--workflow)
+10. [Future Improvements / Roadmap](#future-improvements--roadmap)
 
 ---
 
@@ -30,13 +31,13 @@ This project fetches data from the **REST Countries API V2** and displays it in 
 - Navigate to detailed country pages
 - See and navigate border countries
 
-The project uses **Nuxt 3** for SSR, TypeScript for type safety, and the Composition API for modern, reusable Vue logic.
+The project uses **Nuxt 4** for SSR, TypeScript for type safety, and the Composition API for modern, reusable Vue logic.
 
 ---
 
 ## Project Management / Kanban Board
 
-The project progress, tasks, and issues are tracked using GitHub Projects (Kanban).
+The project progress, epic, tasks, and issues are tracked using GitHub Projects (Kanban).
 You can view all the tasks, open issues, and completed items here:
 
 - **GitHub Repository:** [Journey Mentor Repository](https://github.com/hbsoftco/Journey-Mentor)
@@ -51,9 +52,11 @@ This board shows the current status of all features, enhancements, and bug fixes
 - **Responsive Design:** Fully responsive for mobile and desktop
 - **Dark/Light Mode:** Custom theme toggler using `useTheme` composable
 - **Search:** Supports fuzzy search for approximate country names (e.g., "Grmany" → "Germany")
+- **Debounced Search:** Added debounce logic to optimize search performance and reduce API calls
 - **Filters:** Users can filter countries by region and sort by population or name
 - **Routing:** Client-side routing for country detail pages
 - **Lazy Loading:** Implemented for country flags and lists for improved performance
+- **Data Caching:** Country data cached to improve speed and reduce redundant API requests
 - **Server-Side Rendering:** Ensures content is pre-rendered on the server with fallback handling
 
 ---
@@ -118,6 +121,18 @@ The project can be deployed using any **static hosting** or **serverless platfor
 - Filters are synced with URL query strings
 - Designed for maintainability and scalability using **repository → service → store → component** pattern
 
+---
+
+## Code Quality & Workflow
+
+- **Tailwind CSS v4:** Using the latest version for improved utilities and performance
+- **Linting:** Configured with **ESLint** and **lint-staged** to enforce code consistency
+- **Commit Standards:** Using **Husky** to enforce **Conventional Commit** messages
+- **File Naming Convention:** Enforced **kebab-case** for all file names to maintain uniformity
+- **GitHub Actions:** Configured CI workflows to run linting jobs before merges and pull requests
+
+---
+
 ## Future Improvements / Roadmap
 
 Planned enhancements for the project:
@@ -127,5 +142,6 @@ Planned enhancements for the project:
 - **Error Handling** – Implement centralized error handling for API calls and UI feedback
 - **Sentry Issue Tracking** – Integrate Sentry to monitor and track runtime errors in production
 - **Unit Testing Expansion** – Increase test coverage for all components, composables, and services
+- **GitHub Actions:** Add CI workflows to run testing jobs before merges and pull requests
 
 These improvements are planned as the next steps to make the project more robust, performant, and production-ready.
