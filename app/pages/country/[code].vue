@@ -19,6 +19,13 @@ const { data: country, pending, error } = await useAsyncData(
   },
 );
 
+// Set dynamic page title
+useHead({
+  title: () => country.value?.name
+    ? `${country.value.name} - Journey Mentor`
+    : "Journey Mentor",
+});
+
 // Get border countries from store
 const borderCountries = computed(() => {
   if (!country.value?.borders || country.value.borders.length === 0) {
