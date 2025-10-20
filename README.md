@@ -108,7 +108,7 @@ This board shows the current status of all features, enhancements, and bug fixes
 
 The project can be deployed using any **static hosting** or **serverless platform**. Recommended: Vercel or Netlify.
 
-**Demo link:** _(replace with your deployed URL)_
+**Demo link:** https://journey-mentor-vercel.hosseinbajan.ir/
 
 ---
 
