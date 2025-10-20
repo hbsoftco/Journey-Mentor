@@ -12,6 +12,7 @@ const countriesStore = useCountriesStore();
 
 // Initialize filters from URL
 const searchQuery = ref((route.query.search as string) || "");
+const debouncedSearchQuery = ref((route.query.search as string) || "");
 const selectedRegion = ref((route.query.region as string) || "");
 const sortBy = ref((route.query.sort as string) || "");
 
@@ -47,6 +48,15 @@ const sortOptions = [
   { value: "population-desc", label: "Population (High to Low)" },
 ];
 
+// Debounce search input (300ms delay)
+let searchDebounceTimer: NodeJS.Timeout;
+watch(searchQuery, (newValue) => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = newValue;
+  }, 300);
+});
+
 // Use store's countries
 const allCountries = computed(() => countriesStore.countries);
 
@@ -57,10 +67,10 @@ const filteredCountries = computed(() => {
 
   let result = [...allCountries.value];
 
-  // Filter by search
-  if (searchQuery.value) {
+  // Filter by search (using debounced value)
+  if (debouncedSearchQuery.value) {
     result = result.filter(country =>
-      fuzzyMatch(country.name, searchQuery.value),
+      fuzzyMatch(country.name, debouncedSearchQuery.value),
     );
   }
 
@@ -69,9 +79,9 @@ const filteredCountries = computed(() => {
     result = countriesStore.getCountriesByRegion(selectedRegion.value);
 
     // Apply search on filtered region
-    if (searchQuery.value) {
+    if (debouncedSearchQuery.value) {
       result = result.filter(country =>
-        fuzzyMatch(country.name, searchQuery.value),
+        fuzzyMatch(country.name, debouncedSearchQuery.value),
       );
     }
   }
@@ -97,16 +107,21 @@ const filteredCountries = computed(() => {
   return result;
 });
 
-// Sync with URL
-watch([searchQuery, selectedRegion, sortBy], () => {
+// Sync with URL (using debounced search)
+watch([debouncedSearchQuery, selectedRegion, sortBy], () => {
   const query: Record<string, string> = {};
-  if (searchQuery.value)
-    query.search = searchQuery.value;
+  if (debouncedSearchQuery.value)
+    query.search = debouncedSearchQuery.value;
   if (selectedRegion.value)
     query.region = selectedRegion.value;
   if (sortBy.value)
     query.sort = sortBy.value;
   router.push({ query });
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+  clearTimeout(searchDebounceTimer);
 });
 </script>
 
