@@ -20,13 +20,11 @@ const sortBy = ref((route.query.sort as string) || "");
 const { pending, error } = await useAsyncData(
   "countries-list",
   async () => {
-    // Store handles caching internally
     return await countriesStore.fetchCountries();
   },
   {
     server: true,
     lazy: false,
-    // Get initial data from store if available
     default: () => countriesStore.countries as Country[],
   },
 );
@@ -57,7 +55,6 @@ watch(searchQuery, (newValue) => {
   }, 300);
 });
 
-// Use store's countries
 const allCountries = computed(() => countriesStore.countries);
 
 // Filtered and sorted countries
@@ -67,18 +64,15 @@ const filteredCountries = computed(() => {
 
   let result = [...allCountries.value];
 
-  // Filter by search (using debounced value)
   if (debouncedSearchQuery.value) {
     result = result.filter(country =>
       fuzzyMatch(country.name, debouncedSearchQuery.value),
     );
   }
 
-  // Filter by region
   if (selectedRegion.value) {
     result = countriesStore.getCountriesByRegion(selectedRegion.value);
 
-    // Apply search on filtered region
     if (debouncedSearchQuery.value) {
       result = result.filter(country =>
         fuzzyMatch(country.name, debouncedSearchQuery.value),
@@ -86,7 +80,6 @@ const filteredCountries = computed(() => {
     }
   }
 
-  // Sort
   if (sortBy.value) {
     const [field, order] = sortBy.value.split("-");
     result.sort((a, b) => {
@@ -107,6 +100,31 @@ const filteredCountries = computed(() => {
   return result;
 });
 
+// Infinite scroll implementation
+const { displayedItems, hasMore, loadMore } = useInfiniteScroll(filteredCountries, 20);
+
+// Intersection observer for infinite scroll
+const loadMoreTrigger = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0]?.isIntersecting && hasMore.value) {
+        loadMore();
+      }
+    },
+    { threshold: 0.5 },
+  );
+
+  if (loadMoreTrigger.value) {
+    observer.observe(loadMoreTrigger.value);
+  }
+
+  onUnmounted(() => {
+    observer.disconnect();
+  });
+});
+
 // Sync with URL (using debounced search)
 watch([debouncedSearchQuery, selectedRegion, sortBy], () => {
   const query: Record<string, string> = {};
@@ -119,7 +137,6 @@ watch([debouncedSearchQuery, selectedRegion, sortBy], () => {
   router.push({ query });
 });
 
-// Cleanup on unmount
 onUnmounted(() => {
   clearTimeout(searchDebounceTimer);
 });
@@ -176,16 +193,29 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <!-- Countries Grid -->
-    <div
-      v-else
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-14"
-    >
-      <CountryCard
-        v-for="country in filteredCountries"
-        :key="country.alpha3Code"
-        :country="country"
-      />
+    <!-- Countries Grid with Infinite Scroll -->
+    <div v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-14">
+        <CountryCard
+          v-for="country in displayedItems"
+          :key="country.alpha3Code"
+          :country="country"
+        />
+      </div>
+
+      <!-- Load More Trigger -->
+      <div
+        v-if="hasMore"
+        ref="loadMoreTrigger"
+        class="flex justify-center items-center py-8"
+      >
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-dark-blue dark:border-white" />
+      </div>
+
+      <!-- End of Results -->
+      <div v-else class="text-center py-8 text-dark-blue dark:text-white">
+        <p>All countries loaded</p>
+      </div>
     </div>
   </div>
 </template>
