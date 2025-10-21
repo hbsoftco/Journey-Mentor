@@ -1,0 +1,14 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "types": ["vitest/globals", "node"]
+  },
+  "include": [
+    "tests/**/*",
+    "app/**/*"
+  ]
+}

@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/image",
     "@pinia/nuxt",
+    "@nuxt/test-utils/module",
   ],
 
   app: {
